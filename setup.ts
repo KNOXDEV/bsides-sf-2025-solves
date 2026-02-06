@@ -74,23 +74,19 @@ async function main() {
       // Create symlink to distfiles
       const challengeDir = path.dirname(metadataPath);
       const distfilesSource = path.resolve(challengeDir, "distfiles");
+      const distfileSourceRelative = path.relative(solutionDir, distfilesSource);
       const distfilesLink = path.join(solutionDir, "distfiles");
 
-      try {
-        await Deno.remove(distfilesLink);
-      } catch {
-        // Link doesn't exist, that's fine
-      }
+      await Deno.symlink(distfileSourceRelative, distfilesLink);
 
-      await Deno.symlink(distfilesSource, distfilesLink);
-
-      console.log(`Created: ${solutionDir} -> ${distfilesSource}`);
+      console.log(`Created: ${distfilesLink} -> ${distfileSourceRelative}`);
 
       // Add challengefiles symlink as well, we may need to deploy infra (locally)
       const challengeSource = path.resolve(challengeDir, "challenge");
+      const challengeSourceRelative = path.relative(solutionDir, challengeSource);
       const challengeLink = path.join(solutionDir, "src")
-      await Deno.symlink(challengeSource, challengeLink);
-      console.log(`Created: ${challengeSource} -> ${challengeLink}`);
+      await Deno.symlink(challengeSourceRelative, challengeLink);
+      console.log(`Created: ${challengeLink} -> ${challengeSourceRelative}`);
 
       // Add Readme
       const readmeFile = path.join(solutionDir, "README.md");
