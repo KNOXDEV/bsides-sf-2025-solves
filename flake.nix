@@ -11,11 +11,21 @@
   }: let
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
+    python = pkgs.python312;
+    pythonPackages = with python.pkgs; [
+      pycryptodome
+      wand
+      numpy
+    ];
   in {
     devShells.x86_64-linux.default = pkgs.mkShell {
-      buildInputs = with pkgs; [
-        deno
-      ];
+      packages = [
+        pkgs.deno
+        pkgs.basedpyright
+        python
+      ] ++ pythonPackages;
+
+
     };
   };
 }
