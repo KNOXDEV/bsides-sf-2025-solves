@@ -2,8 +2,8 @@
 // his sets up the directory structure I want for my solutions automatically.
 // Disclosure: the entire file is 80% vibecoded
 
-import { parse } from "jsr:@std/yaml@1.0.5";
-import { ensureDir } from "jsr:@std/fs@1.0.14";
+import { parse, stringify } from "jsr:@std/yaml@1.0.5";
+import { ensureDir, exists } from "jsr:@std/fs@1.0.14";
 import * as path from "jsr:@std/path@1.0.8";
 
 interface ChallengeMetadata {
@@ -31,9 +31,24 @@ function getCategory(tags: string[]): string {
   // Use the first non-difficulty tag as the category
   // Filter out common difficulty indicators
   const difficultyTags = ["101", "beginner", "easy", "medium", "hard"];
-  const categoryTag = tags.map((tag) => tag.toLowerCase()).find((tag) => !difficultyTags.includes(tag));
+  const categoryTag = tags.map((tag) => tag.toLowerCase()).find((tag) =>
+    !difficultyTags.includes(tag)
+  );
   return categoryTag || "misc";
 }
+
+const DEFAULT_SERVICE_YAML = {
+  services: {
+    challenge: {
+      build: {
+        context: "./src/challenge",
+        dockerfile: "Dockerfile"
+      },
+      ports: [] as string[],
+      restart: "unless-stopped"
+    }
+  }
+};
 
 async function main() {
   const challengesDir = "./challenges";
@@ -68,24 +83,46 @@ async function main() {
       const category = getCategory(metadata.tags);
 
       // skip on-site challenges
-      if (category == 'on-site')
+      if (category == "on-site") {
         continue;
+      }
 
       // Create solution directory structure
-      const solutionDir = path.join(solutionsDir, category, `${difficulty} - ${challengeName}`);
+      const solutionDir = path.join(
+        solutionsDir,
+        category,
+        `${difficulty} - ${challengeName}`,
+      );
       await ensureDir(solutionDir);
 
       // Create symlink to distfiles
       const challengeDir = path.dirname(metadataPath);
       const challengeDirRelative = path.relative(solutionDir, challengeDir);
       const sourceLink = path.join(solutionDir, "src");
+      // always recreate link
+      if(await exists(sourceLink))
+        await Deno.remove(sourceLink)
       await Deno.symlink(challengeDirRelative, sourceLink);
       console.log(`Created: ${sourceLink} -> ${challengeDirRelative}`);
 
-      // Add Readme
+      // Add Readme IF one does not already exist
       const readmeFile = path.join(solutionDir, "README.md");
-      await Deno.writeTextFile(readmeFile, `# ${metadata.name}\nOriginal Prompt:\n\`\`\`\n${metadata.description}\`\`\``);
+      if (!(await exists(readmeFile))) {
+        await Deno.writeTextFile(
+          readmeFile,
+          `# ${metadata.name}\nOriginal Prompt:\n\`\`\`\n${metadata.description}\`\`\``,
+        );
+      }
 
+      // add a simple starter docker-compose if this challenge needs a service deployed
+      if (metadata.port) {
+        const composeFile = path.join(solutionDir, "docker-compose.yml");
+        if(!(await exists(composeFile))) {
+          const serviceConfig = structuredClone(DEFAULT_SERVICE_YAML);
+          serviceConfig.services.challenge.ports.push(`8080:${metadata.port}`);
+          await Deno.writeTextFile(composeFile, stringify(serviceConfig));
+        }
+      }
     } catch (error) {
       console.error(`Error processing ${metadataPath}:`, error);
     }

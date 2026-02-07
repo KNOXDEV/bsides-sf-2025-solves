@@ -1,0 +1,8 @@
+services:
+  challenge:
+    build:
+      context: ./src/challenge
+      dockerfile: Dockerfile
+    ports:
+      - '8080:4000'
+    restart: unless-stopped
