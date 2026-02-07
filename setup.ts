@@ -67,6 +67,10 @@ async function main() {
       const difficulty = getDifficulty(metadata);
       const category = getCategory(metadata.tags);
 
+      // skip on-site challenges
+      if (category == 'on-site')
+        continue;
+
       // Create solution directory structure
       const solutionDir = path.join(solutionsDir, category, `${difficulty} - ${challengeName}`);
       await ensureDir(solutionDir);
