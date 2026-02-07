@@ -22,6 +22,15 @@
       packages = [
         pkgs.deno
         pkgs.basedpyright
+
+        # cli tools for steg/forensics
+        pkgs.exiftool
+        pkgs.binwalk
+        pkgs.imagemagick
+
+        # java
+        pkgs.jadx
+
         python
       ] ++ pythonPackages;
 
