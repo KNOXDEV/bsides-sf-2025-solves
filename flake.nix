@@ -27,14 +27,17 @@
         pkgs.exiftool
         pkgs.binwalk
         pkgs.imagemagick
+        
+        # netcat, telnet, etc
+        pkgs.inetutils
+        pkgs.socat
 
-        # java
-        pkgs.jadx
+        # reversing
+        pkgs.jadx   # android
+        pkgs.ghidra # x86_64 executables
 
         python
       ] ++ pythonPackages;
-
-
     };
   };
 }
