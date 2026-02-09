@@ -1,3 +1,11 @@
 {
-    "deno.enable": true
+    "deno.enable": true,
+    // this is a temporary measure that at least gets rid of the SageMath errors, but
+    // also doesn't seem to provide any actual IntelliSense for some reason.
+    "basedpyright.analysis.extraPaths": [
+        // Doesn't work because direnv-supplied environment variables
+        // are not defined when settings are parsed https://github.com/direnv/direnv-vscode/issues/592
+        "${env:SAGE_EXTRA_PATH}",
+        "/nix/store/2jpkf3zip9b7g6kz2hjyay0j118k7a2r-python3.13-sagelib-10.7/lib/python3.13/site-packages"
+    ]
 }
