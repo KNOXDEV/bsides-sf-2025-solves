@@ -37,6 +37,8 @@
       packages =
         [
           pkgs.deno
+          pkgs.ty
+          pkgs.ruff
 
           # cli tools for steg/forensics
           pkgs.exiftool

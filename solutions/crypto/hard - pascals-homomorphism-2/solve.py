@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-from random import randint
-from sage.rings.factorint import factor_trial_division
+from sage.rings.factorint import factor_trial_division  # ty:ignore[unresolved-import]
 from sage.all import Integer
 from pwn import *
 
