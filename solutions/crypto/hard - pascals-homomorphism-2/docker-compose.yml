@@ -1,0 +1,8 @@
+services:
+  challenge:
+    build:
+      context: ../easy - pascals-homomorphism-1/src/challenge
+      dockerfile: Dockerfile
+    ports:
+      - '8080:1999'
+    restart: unless-stopped
