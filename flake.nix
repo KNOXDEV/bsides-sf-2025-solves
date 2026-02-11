@@ -12,18 +12,22 @@
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
 
-    python = pkgs.python312;
+    # You'll notice that we register our python packages separately from the interpreter
+    # as opposed to using the more typical `python.withPackages` to create an environment.
+    # This is equivilent to installing them "globally" (although still within the temporary shell).
+    python = pkgs.python313;
     pythonPackages = with python.pkgs; [
       # image manipulation
       wand
 
       # math stuff for crypto challenges.
-      # Note that certain things simply require SageMath,
-      # which is only packaged as its own venv, and has to be accessed via
-      # the wrapped `sage` cli for now.
       pycryptodome
       numpy
       sympy
+      # Including sage.lib in my inputs lets me use (most) Sage functionality in Python files.
+      # Also note that this is not pinned to the above selected interpreter.
+      # https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/sa/sage/sage.nix
+      pkgs.sage.lib
 
       # socket shenanigans
       pwntools
@@ -33,7 +37,6 @@
       packages =
         [
           pkgs.deno
-          pkgs.basedpyright
 
           # cli tools for steg/forensics
           pkgs.exiftool
