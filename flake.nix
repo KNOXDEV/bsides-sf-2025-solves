@@ -49,9 +49,10 @@
           pkgs.inetutils
           pkgs.socat
 
-          # reversing
+          # reversing guis
           pkgs.jadx # android
           pkgs.ghidra # x86_64 executables
+          pkgs.cutter # simpler reversing alternative
 
           # cli tools for crypto / math
           pkgs.sage
