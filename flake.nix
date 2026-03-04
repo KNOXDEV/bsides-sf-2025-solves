@@ -52,7 +52,13 @@
           # reversing guis
           pkgs.jadx # android
           pkgs.ghidra # x86_64 executables
-          pkgs.cutter # simpler reversing alternative
+          # simpler reversing alternative
+          (pkgs.cutter.withPlugins (ps: with ps; [jsdec rz-ghidra sigdb]))
+
+          # local binary manipulation
+          pkgs.auto-patchelf
+          pkgs.ltrace
+          pkgs.strace
 
           # cli tools for crypto / math
           pkgs.sage
